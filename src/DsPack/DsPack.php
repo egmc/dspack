@@ -32,7 +32,12 @@ class DsPack {
 	protected function makeArchives() {
 		$this->archives = [];
 		foreach ($this->config['source_list'] as $source) {
-			$filename = isset($soure['filename']) ? $soure['filename'] : pathinfo($source['target'], PATHINFO_BASENAME) . ".tar.gz";
+			$filename = isset($soure['filename']) ? $soure['filename'] : pathinfo($source['target'], PATHINFO_BASENAME);
+			if ($source['type'] == "db") {
+				$filename .= ".dump";
+				$sqlpath = $filename . ".sql";
+			}
+			$filename .= ".tar.gz";
 			$filepath = implode("/", [$this->config['work_dir'], $filename]);
 			switch ($source['type']) {
 				case 'dir':
@@ -42,7 +47,20 @@ class DsPack {
 					shell_exec($command);
 					break;
 				case 'db':
-					// TODO db command
+					$command = "mysqldump ";
+					$command .= "-u{$source['user']}";
+					if (isset($source['pass'])) {
+						$command .= "-p{$source['pass']}";
+					}
+					$command .= " {$source['target']} > $sqlpath";
+					echo "$command\n";
+					shell_exec($command);
+					chdir(dirname($sqlpath));
+					$tar_command =  implode(" ", [$this->tar_bin, $this->tar_option, $filepath, basename($sqlpath)]);
+					echo "$tar_command\n";
+					shell_exec($tar_command);
+					unlink($sqlpath);
+					
 					break;
 				default:
 					throw new Exception("unknown type {$source['type']}");
