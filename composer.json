@@ -1,0 +1,18 @@
+{
+    "name": "egmc/dspack",
+    "require": {
+        "aws/aws-sdk-php": "2.1.0",
+        "symfony/yaml": "v2.1.3"
+    },
+    "autoload": {
+        "psr-0": {
+            "DsPack": "src"
+        }
+    },
+    "authors": [
+        {
+            "name": "egmc",
+            "email": "waltz4debby@eg2mix.com"
+        }
+    ]
+}
