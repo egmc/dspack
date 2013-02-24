@@ -42,7 +42,10 @@ class DsPack {
 			switch ($source['type']) {
 				case 'dir':
 					$command = implode(" ", [$this->tar_bin, $this->tar_option, $filepath, basename($source['target'])]);
-					//echo "$command\n";
+					if (isset($source['exclude_list']) && is_array($source['exclude_list'])) {
+						$command .= implode('', array_map(function($ex){return " --exclude $ex";}, $source['exclude_list']));
+					}
+					$this->out($command);
 					chdir(dirname($source['target']));
 					shell_exec($command);
 					break;
@@ -53,11 +56,11 @@ class DsPack {
 						$command .= "-p{$source['pass']}";
 					}
 					$command .= " {$source['target']} > $sqlpath";
-					//echo "$command\n";
+					$this->out($command);
 					shell_exec($command);
 					chdir(dirname($sqlpath));
 					$tar_command =  implode(" ", [$this->tar_bin, $this->tar_option, $filepath, basename($sqlpath)]);
-					//echo "$tar_command\n";
+					$this->out($tar_command);
 					shell_exec($tar_command);
 					unlink($sqlpath);
 					
@@ -107,4 +110,17 @@ class DsPack {
 		return shell_exec("rm -fr " . $this->config['work_dir'] . "/*");
 	}
 	
+	/**
+	 * 標準出力
+	 *
+	 * 標準出力を実行。
+	 * サイレントモード時は出力しない。
+	 *
+	 * @param string $str
+	 */
+	protected function out($str) {
+		if(empty($this->config['silent_mode']) || $this->config['silent_mode'] == false) {
+			echo "$str\n";
+		}
+	}
 }
