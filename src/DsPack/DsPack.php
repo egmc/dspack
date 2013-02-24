@@ -42,7 +42,7 @@ class DsPack {
 			switch ($source['type']) {
 				case 'dir':
 					$command = implode(" ", [$this->tar_bin, $this->tar_option, $filepath, basename($source['target'])]);
-					echo "$command\n";
+					//echo "$command\n";
 					chdir(dirname($source['target']));
 					shell_exec($command);
 					break;
@@ -53,11 +53,11 @@ class DsPack {
 						$command .= "-p{$source['pass']}";
 					}
 					$command .= " {$source['target']} > $sqlpath";
-					echo "$command\n";
+					//echo "$command\n";
 					shell_exec($command);
 					chdir(dirname($sqlpath));
 					$tar_command =  implode(" ", [$this->tar_bin, $this->tar_option, $filepath, basename($sqlpath)]);
-					echo "$tar_command\n";
+					//echo "$tar_command\n";
 					shell_exec($tar_command);
 					unlink($sqlpath);
 					
