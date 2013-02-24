@@ -2,6 +2,8 @@
 namespace DsPack;
 
 use Aws\S3\S3Client;
+use Aws\Common\Enum\Size;
+use Aws\S3\Model\MultipartUpload\UploadBuilder;
 
 class DsPack {
 	
@@ -81,11 +83,19 @@ class DsPack {
 						'secret' => $target['secret'],
 					]);
 					foreach ($this->archives as $archive) {
-						$result = $s3->putObject([
-								'Bucket' => $target['bucket'],
-								'Key' => pathinfo($archive, PATHINFO_BASENAME),
-								'Body' => file_get_contents($archive)
-						]);
+						$uploader = UploadBuilder::newInstance();
+						$uploader->setClient($s3);
+						$uploader->setSource($archive);
+						$uploader->setBucket($target['bucket']);
+						$uploader->setKey( pathinfo($archive, PATHINFO_BASENAME));
+						$uploader->setMinPartSize(10 * Size::MB);
+						$uploader->build()->upload();
+												
+// 						$result = $s3->putObject([
+// 								'Bucket' => $target['bucket'],
+// 								'Key' => pathinfo($archive, PATHINFO_BASENAME),
+// 								'Body' => file_get_contents($archive)
+// 						]);
 					}
 					
 					break;
