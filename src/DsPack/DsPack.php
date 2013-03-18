@@ -34,7 +34,7 @@ class DsPack {
 	protected function makeArchives() {
 		$this->archives = [];
 		foreach ($this->config['source_list'] as $source) {
-			$filename = isset($soure['filename']) ? $soure['filename'] : pathinfo($source['target'], PATHINFO_BASENAME);
+			$filename = isset($source['filename']) ? $source['filename'] : pathinfo($source['target'], PATHINFO_BASENAME);
 			if ($source['type'] == "db") {
 				$filename .= ".dump";
 				$sqlpath = $filename . ".sql";
@@ -91,11 +91,6 @@ class DsPack {
 						$uploader->setMinPartSize(10 * Size::MB);
 						$uploader->build()->upload();
 												
-// 						$result = $s3->putObject([
-// 								'Bucket' => $target['bucket'],
-// 								'Key' => pathinfo($archive, PATHINFO_BASENAME),
-// 								'Body' => file_get_contents($archive)
-// 						]);
 					}
 					
 					break;
