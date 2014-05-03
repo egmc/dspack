@@ -35,6 +35,9 @@ class DsPack {
 		$this->archives = [];
 		foreach ($this->config['source_list'] as $source) {
 			$filename = isset($source['filename']) ? $source['filename'] : pathinfo($source['target'], PATHINFO_BASENAME);
+			if (!empty($this->config['filename_date_format'])) {
+				$filename .= "." . (new \DateTime())->format($this->config['filename_date_format']);
+			}
 			if ($source['type'] == "db") {
 				$filename .= ".dump";
 				$sqlpath = $filename . ".sql";
