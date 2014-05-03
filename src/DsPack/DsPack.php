@@ -58,7 +58,7 @@ class DsPack {
 					$command = "mysqldump ";
 					$command .= "-u{$source['user']}";
 					if (isset($source['pass'])) {
-						$command .= "-p{$source['pass']}";
+						$command .= " -p{$source['pass']}";
 					}
 					$command .= " {$source['target']} > $sqlpath";
 					$this->out($command);
