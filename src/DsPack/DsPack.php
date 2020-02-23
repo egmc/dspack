@@ -40,7 +40,7 @@ class DsPack {
 			}
 			if ($source['type'] == "db") {
 				$filename .= ".dump";
-				$sqlpath = $filename . ".sql";
+				$sqlpath = implode("/", [$this->config['work_dir'], $filename . ".sql"]);
 			}
 			$filename .= ".tar.gz";
 			$filepath = implode("/", [$this->config['work_dir'], $filename]);
