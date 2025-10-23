@@ -1,13 +1,14 @@
 {
     "name": "egmc/dspack",
     "require": {
-        "aws/aws-sdk-php": "2.1.0",
-        "symfony/event-dispatcher" : "~2.7",
-	"symfony/yaml": "v2.1.3"
+        "php": "^8.0",
+        "aws/aws-sdk-php": "^3.0",
+        "symfony/event-dispatcher": "^6.0",
+        "symfony/yaml": "^6.0"
     },
     "autoload": {
-        "psr-0": {
-            "DsPack": "src"
+        "psr-4": {
+            "DsPack\\": "src/DsPack"
         }
     },
     "authors": [

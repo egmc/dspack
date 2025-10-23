@@ -2,8 +2,7 @@
 namespace DsPack;
 
 use Aws\S3\S3Client;
-use Aws\Common\Enum\Size;
-use Aws\S3\Model\MultipartUpload\UploadBuilder;
+use Aws\S3\ObjectUploader;
 
 class DsPack {
 	
@@ -24,7 +23,7 @@ class DsPack {
 			mkdir($this->config['work_dir'], 0777, true);
 		}
 		if (!is_dir($this->config['work_dir']) || !is_writable($this->config['work_dir'])) {
-			throw new Exception("{$this->config['work_dir']} is not writable dir");
+			throw new \Exception("{$this->config['work_dir']} is not writable dir");
 		}
 		$this->clearWorkDir();
 		$this->makeArchives();
@@ -71,7 +70,7 @@ class DsPack {
 					
 					break;
 				default:
-					throw new Exception("unknown type {$source['type']}");
+					throw new \Exception("unknown type {$source['type']}");
 			}
 			$this->archives[] = $filepath;
 		}
@@ -81,24 +80,32 @@ class DsPack {
 		foreach ($this->config['target_list'] as $target) {
 			switch ($target['type']){
 				case 's3':
-					$s3 = S3Client::factory([
-						'key' => $target['key'],
-						'secret' => $target['secret'],
+					$s3 = new S3Client([
+						'version' => 'latest',
+						'region' => $target['region'] ?? 'us-east-1',
+						'credentials' => [
+							'key' => $target['key'],
+							'secret' => $target['secret'],
+						],
 					]);
 					foreach ($this->archives as $archive) {
-						$uploader = UploadBuilder::newInstance();
-						$uploader->setClient($s3);
-						$uploader->setSource($archive);
-						$uploader->setBucket($target['bucket']);
-						$uploader->setKey( pathinfo($archive, PATHINFO_BASENAME));
-						$uploader->setMinPartSize(10 * Size::MB);
-						$uploader->build()->upload();
+						$uploader = new ObjectUploader(
+							$s3,
+							$target['bucket'],
+							pathinfo($archive, PATHINFO_BASENAME),
+							fopen($archive, 'r'),
+							'private',
+							[
+								'part_size' => 10 * 1024 * 1024, // 10 MB
+							]
+						);
+						$uploader->upload();
 												
 					}
 					
 					break;
 				default:
-					throw new Exception("invalid target type {$target['type']}");
+					throw new \Exception("invalid target type {$target['type']}");
 			}
 		}
 	}
